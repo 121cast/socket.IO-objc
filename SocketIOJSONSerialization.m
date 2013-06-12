@@ -25,18 +25,15 @@
 
 extern NSString * const SocketIOException;
 
-// covers the methods in SBJson and JSONKit
+// covers the methods in JSONKit
 @interface NSObject (SocketIOJSONSerialization)
 
-// used by both JSONKit and SBJson
+// used by JSONKit
 - (id) objectWithData:(NSData *)data;
 
 // Use by JSONKit serialization
 - (NSString *) JSONString;
 - (id) decoder;
-
-// Used by SBJsonWriter
-- (NSString *) stringWithObject:(id)object;
 
 @end
 
@@ -44,18 +41,6 @@ extern NSString * const SocketIOException;
 
 + (id) objectFromJSONData:(NSData *)data error:(NSError **)error {
     Class serializer;
-    
-    // try SBJson first
-    serializer = NSClassFromString(@"SBJsonParser");
-    if (serializer) {
-        id parser;
-        id object;
-        
-        parser = [[serializer alloc] init];
-        object = [parser objectWithData:data];
-        
-        return object;
-    }
     
     // try Foundation's JSON coder, available in OS X 10.7/iOS 5.0
     serializer = NSClassFromString(@"NSJSONSerialization");
@@ -70,7 +55,7 @@ extern NSString * const SocketIOException;
     }
     
     // unable to find a suitable JSON deseralizer
-    [NSException raise:SocketIOException format:@"socket.IO-objc requires SBJson, JSONKit or an OS that has NSJSONSerialization."];
+    [NSException raise:SocketIOException format:@"socket.IO-objc requires JSONKit or an OS that has NSJSONSerialization."];
     
     return nil;
 }
@@ -80,15 +65,6 @@ extern NSString * const SocketIOException;
     NSString *jsonString;
     
     jsonString = nil;
-    serializer = NSClassFromString(@"SBJsonWriter");
-    if (serializer) {
-        id writer;
-        
-        writer = [[serializer alloc] init];
-        jsonString = [writer stringWithObject:object];
-        
-        return jsonString;
-    }
     
     serializer = NSClassFromString(@"NSJSONSerialization");
     if (serializer) {
@@ -107,7 +83,7 @@ extern NSString * const SocketIOException;
     }
     
     // unable to find a suitable JSON seralizer
-    [NSException raise:SocketIOException format:@"socket.IO-objc requires SBJson, JSONKit or an OS that has NSJSONSerialization."];
+    [NSException raise:SocketIOException format:@"socket.IO-objc requires JSONKit or an OS that has NSJSONSerialization."];
     
     return nil;
 }
